@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Rawan Longsor Bantul</title>
+    <link rel="stylesheet" href="library/leaflet/leaflet.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <script src="library/leaflet/leaflet.js"></script>
+    <script src="library/leaflet-providers-master/leaflet-providers.js"></script>
+    <script src="library/jquery.min.js"></script>
+</head>
+
+<body>
+    <div id="map">
+        <script>
+            var map = L.map('map').setView([-7.911134, 110.373421], 13);
+
+            var baseLayers = {
+                'Esri WorldTopoMap': L.tileLayer.provider('Esri.WorldTopoMap'),
+                'Esri WorldImagery': L.tileLayer.provider('Esri.WorldImagery').addTo(map),
+                'OSM Default': L.tileLayer.provider('OpenStreetMap.DE'),
+                'OSM France': L.tileLayer.provider('OpenStreetMap.France')
+            };
+
+            /* Memanggil Layer Rawan Banjir */
+            var AreaRawanLongsor = L.geoJson(null, {
+                style: function(feature) {
+                    return {
+                        color: "black",
+                        fillColor: klasLongsor[feature.properties.kelas],
+                        weight: 0.3,
+                        opacity: 0,
+                        fillOpacity: 0.7
+                    };
+                },
+                onEachFeature: function( feature, layer ){
+                    layer.bindPopup(
+                        "Klas Rawan Longsor : " + "<left>" + feature.properties.kelas + "</left>" + "<br>" +
+                        "Luas :" + "<left>" + feature.properties.Shape_Area + "</left>" + " m2"
+                        )
+                }
+            });
+            $.getJSON("data/pair2s.json", function(data) {
+                AreaRawanLongsor.addData(data);
+            });
+
+            /* Merubah Tampilan Warna Berdasar Atribut Klas Banjir */
+            var klasLongsor = {
+                "aman":"#19ff00",
+                "cukup aman":"#70ff00",
+                "agak rawan":"#e7ff00",
+                "rawan":"#ff9500",
+                "sangat rawan":"#ff0000"
+            };
+
+            var mapLayers = {
+                'Rawan Longsor Bantul': AreaRawanLongsor
+            };
+
+            L.control.layers(baseLayers, mapLayers).addTo(map);
+        </script>
+    </div>
+</body>
+
+</html>
